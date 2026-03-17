@@ -103,6 +103,18 @@
       "description": "",
       "image": "images/微信图片_20260317220803_773_220.jpg",
       "price": "0"
+    },
+    {
+      "name": "照烧肥牛卷",
+      "description": "洋葱照烧版",
+      "image": "images/default.png",
+      "price": "0"
+    },
+    {
+      "name": "酸汤肥牛",
+      "description": "什么味要看买的是谁家的料",
+      "image": "images/default.png",
+      "price": "0"
     }
   ]
 }
