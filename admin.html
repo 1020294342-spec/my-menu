@@ -37,6 +37,7 @@
 <script>
     let editingIndex = -1;
 
+    // 加载菜单
     async function loadMenu() {
         try {
             const response = await fetch('menu.json');
@@ -62,6 +63,7 @@
         }
     }
 
+    // 点击修改
     async function editDish(index) {
         const response = await fetch('menu.json');
         const data = await response.json();
@@ -73,6 +75,7 @@
         window.scrollTo(0, 0);
     }
 
+    // 保存（新增或修改）
     async function uploadAndSave() {
         const fileInput = document.getElementById('file-selector');
         const name = document.getElementById('name').value;
@@ -109,6 +112,7 @@
         } catch (e) { alert("保存失败"); }
     }
 
+    // 删除
     async function deleteDish(index) {
         if (!confirm("确定删除吗？")) return;
         try {
