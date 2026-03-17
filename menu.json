@@ -1,0 +1,95 @@
+{
+  "dishes": [
+    {
+      "id": 1,
+      "name": "番茄肉酱面",
+      "description": "比外面卖的好吃的那种",
+      "image": "images/fanqieroujiangmian.jpg",
+      "price": "0"
+    },
+    {
+      "id": 2,
+      "name": "芝士肉酱饼",
+      "description": "谁吃谁哇塞",
+      "image": "images/微信图片_20260317204053_760_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 3,
+      "name": "黄油苹果梅肉",
+      "description": "黄油哎！煎肉哎！",
+      "image": "images/微信图片_20260317204327_766_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 4,
+      "name": "卡美罗",
+      "description": "焦糖，可加入饮品",
+      "image": "images/卡美罗.jpg",
+      "price": "0"
+    },
+    {
+      "id": 5,
+      "name": "水果厚多士",
+      "description": "水果不一定是什么",
+      "image": "images/微信图片_20260317204323_763_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 6,
+      "name": "蒲烧茄子",
+      "description": "巨下饭",
+      "image": "images/微信图片_20260317204324_764_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 7,
+      "name": "糖醋里脊",
+      "description": "老式的喔",
+      "image": "images/微信图片_20260317204325_765_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 8,
+      "name": "西红柿鸡蛋汤",
+      "description": "有没有疙瘩都行",
+      "image": "images/微信图片_20260317204406_767_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 9,
+      "name": "肉酱米线",
+      "description": "米线、米粉都行",
+      "image": "images/微信图片_20260317204433_768_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 10,
+      "name": "锅包肉",
+      "description": "68不过分",
+      "image": "images/微信图片_20260317204517_769_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 11,
+      "name": "炸鸡块",
+      "description": "堪比傻子炸鸡",
+      "image": "images/微信图片_20260317204556_770_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 12,
+      "name": "番茄鸡腿肉",
+      "description": "低脂低卡好吃",
+      "image": "images/微信图片_20260317204638_771_220.jpg",
+      "price": "0"
+    },
+    {
+      "id": 13,
+      "name": "盐葱鸡腿肉",
+      "description": "俺要吃葱",
+      "image": "images/微信图片_20260317204702_772_220.jpg",
+      "price": "0"
+    }
+  ]
+}
