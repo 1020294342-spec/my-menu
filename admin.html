@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>菜单管理-支持上传</title>
+    <style>
+        body { font-family: sans-serif; display: flex; gap: 20px; padding: 20px; background: #f4f7f6; }
+        .form-box { width: 350px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); height: fit-content; }
+        .list-box { flex: 1; background: white; padding: 20px; border-radius: 12px; }
+        input, textarea { width: 100%; margin: 10px 0; padding: 12px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 8px; }
+        .save-btn { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        /* 列表条目样式 */
+        .dish-item { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; }
+        .dish-item img { width: 60px; height: 60px; border-radius: 8px; margin-right: 15px; object-fit: cover; }
+        .dish-info { flex: 1; }
+        .dish-info h4 { margin: 0; color: #333; }
+        .dish-info p { margin: 5px 0 0; font-size: 14px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2 id="form-title">➕ 新增菜品</h2>
+        <input type="text" id="name" placeholder="菜名">
+        <textarea id="desc" placeholder="菜品描述"></textarea>
+        
+        <label>上传图片：</label>
+        <input type="file" id="file-selector" accept="image/*">
+        <button class="save-btn" onclick="uploadAndSave()">保存菜品</button>
+        <button style="width:100%; margin-top:10px; border:none; background:none; cursor:pointer;" onclick="location.reload()">重置页面</button>
+    </div>
+
+    <div class="list-box">
+        <h2>📜 当前菜单</h2>
+        <div id="admin-menu-list"></div>
+    </div>
+
+<script>
+    let editingIndex = -1;
+
+    async function loadMenu() {
+        try {
+            const response = await fetch('menu.json');
+            const data = await response.json();
+            const list = document.getElementById('admin-menu-list');
+            if (data.dishes && list) {
+                list.innerHTML = data.dishes.map((dish, index) => `
+                    <div class="dish-item">
+                        <img src="${dish.image}" onerror="this.src='images/default.png'">
+                        <div class="dish-info">
+                            <h4>${dish.name}</h4>
+                            <p>${dish.description}</p>
+                        </div>
+                        <div class="dish-ops">
+                            <button onclick="editDish(${index})" style="background:#28a745; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; margin-right:5px;">修改</button>
+                            <button onclick="deleteDish(${index})" style="background:#dc3545; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">删除</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } catch (e) {
+            console.log("加载失败，请确保 server.py 正在运行");
+        }
+    }
+
+    async function editDish(index) {
+        const response = await fetch('menu.json');
+        const data = await response.json();
+        const dish = data.dishes[index];
+        document.getElementById('name').value = dish.name;
+        document.getElementById('desc').value = dish.description;
+        document.getElementById('form-title').innerText = "📝 修改菜品：" + dish.name;
+        editingIndex = index;
+        window.scrollTo(0, 0);
+    }
+
+    async function uploadAndSave() {
+        const fileInput = document.getElementById('file-selector');
+        const name = document.getElementById('name').value;
+        const desc = document.getElementById('desc').value;
+        if (!name) return alert("请填写菜名");
+
+        let imgPath = "";
+        if (fileInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            const uploadRes = await fetch('/upload', { method: 'POST', body: formData });
+            imgPath = "images/" + await uploadRes.text();
+        } else if (editingIndex > -1) {
+            const res = await fetch('menu.json');
+            const menu = await res.json();
+            imgPath = menu.dishes[editingIndex].image;
+        } else {
+            imgPath = "images/default.png";
+        }
+
+        const dishData = { name, description: desc, image: imgPath, price: "0" };
+        const url = editingIndex > -1 ? `/edit?index=${editingIndex}` : '/add';
+
+        try {
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dishData) 
+            });
+            if (response.ok) {
+                alert(editingIndex > -1 ? '修改成功' : '新增成功');
+                location.reload();
+            }
+        } catch (e) { alert("保存失败"); }
+    }
+
+    async function deleteDish(index) {
+        if (!confirm("确定删除吗？")) return;
+        try {
+            const response = await fetch(`/delete?index=${index}`, { method: 'POST' });
+            if (response.ok) location.reload();
+        } catch (e) { alert("删除失败"); }
+    }
+
+    window.onload = loadMenu;
+</script>
+</body>
+</html>
