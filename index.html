@@ -37,7 +37,7 @@
         // 从 menu.json 读取数据
         async function fetchMenu() {
             try {
-                const response = await fetch('/menu.json');
+                const response = await fetch('menu.json');
                 const data = await response.json();
                 renderMenu(data.dishes);
             } catch (e) {
