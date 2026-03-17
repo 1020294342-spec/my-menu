@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的私人餐厅 · 点餐</title>
+    <style>
+        :root { --primary: #ff4757; --bg: #f8f9fa; }
+        body { font-family: 'PingFang SC', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h1 { color: #2f3542; margin-bottom: 20px; font-size: 24px; }
+        .menu-grid { width: 100%; max-width: 600px; display: grid; gap: 15px; }
+        .dish-card { 
+            background: white; border-radius: 16px; overflow: hidden; 
+            display: flex; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .dish-card:active { transform: scale(0.98); }
+        .dish-img { width: 100px; height: 100px; object-fit: cover; background: #eee; }
+        .dish-info { flex: 1; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
+        .dish-name { font-size: 18px; font-weight: bold; color: #2f3542; }
+        .dish-desc { font-size: 13px; color: #747d8c; margin: 4px 0; }
+        .dish-footer { display: flex; justify-content: space-between; align-items: center; }
+        .price { color: var(--primary); font-weight: bold; font-size: 16px; }
+        .order-btn { 
+            background: var(--primary); color: white; border: none; 
+            padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>👨‍🍳 今日私房菜单</h1>
+    <div class="menu-grid" id="menu-list">
+        </div>
+
+    <script>
+        // 从 menu.json 读取数据
+        async function fetchMenu() {
+            try {
+                const response = await fetch('menu.json');
+                const data = await response.json();
+                renderMenu(data.dishes);
+            } catch (e) {
+                console.error("加载菜单失败，请检查文件是否存在", e);
+            }
+        }
+
+        function renderMenu(dishes) {
+            const list = document.getElementById('menu-list');
+            list.innerHTML = ''; 
+
+            dishes.forEach(dish => {
+                const card = document.createElement('div');
+                card.className = 'dish-card';
+                
+                // 处理图片显示逻辑：如果没有图或加载失败，显示默认图标
+                const imgUrl = dish.image || "https://img.icons8.com/fluency/96/meal.png";
+                
+                card.innerHTML = `
+                    <img src="${imgUrl}" class="dish-img" onerror="this.src='https://img.icons8.com/fluency/96/meal.png'">
+                    <div class="dish-info">
+                        <div>
+                            <div class="dish-name">${dish.name}</div>
+                            <div class="dish-desc">${dish.description}</div>
+                        </div>
+                        <div class="dish-footer">
+                            <div class="price">免费点餐</div>
+                            <button class="order-btn" onclick="orderDish('${dish.name}')">下单</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function orderDish(name) {
+            alert(`✅ 收到！正在为您准备：${name}\n(稍后我们将接入微信通知功能)`);
+        }
+
+        // 页面打开时自动运行
+        fetchMenu();
+    </script>
+</body>
+</html>
