@@ -118,6 +118,30 @@
       "description": "什么味要看买的是谁家的料",
       "image": "images/default.png",
       "price": "0"
+    },
+    {
+      "name": "葱爆羊肉卷",
+      "description": "和孜然羊肉一样",
+      "image": "images/default.png",
+      "price": "0"
+    },
+    {
+      "name": "红烧排骨",
+      "description": "敲好吃的",
+      "image": "images/default.png",
+      "price": "0"
+    },
+    {
+      "name": "西红柿炒鸡蛋",
+      "description": "过于家常了",
+      "image": "images/default.png",
+      "price": "0"
+    },
+    {
+      "name": "炒土豆丝",
+      "description": "说做的不好吃可不行",
+      "image": "images/default.png",
+      "price": "0"
     }
   ]
 }
