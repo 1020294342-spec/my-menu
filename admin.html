@@ -15,11 +15,24 @@
         .dish-info { flex: 1; }
         .dish-info h4 { margin: 0; color: #333; }
         .dish-info p { margin: 5px 0 0; font-size: 14px; color: #666; }
+        .settings-box { width: 350px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); height: fit-content; margin-bottom: 20px; }
+        .settings-btn { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .hint { font-size: 12px; color: #999; margin: 2px 0 10px; }
     </style>
 </head>
 <body>
-    <div class="form-box">
-        <h2 id="form-title">➕ 新增菜品</h2>
+    <div style="width: 350px; display: flex; flex-direction: column; gap: 20px;">
+        <div class="settings-box">
+            <h2>⚙️ 页面设置</h2>
+            <input type="text" id="menu-title" placeholder="菜单标题（如：今日私房菜单）">
+            <input type="text" id="menu-subtitle" placeholder="备注小字（如：每周三更新菜单）">
+            <textarea id="order-message" placeholder="下单弹窗提示语"></textarea>
+            <p class="hint">提示：用 {name} 代表菜名，如"已收到您点的{name}"</p>
+            <button class="settings-btn" onclick="saveSettings()">保存设置</button>
+        </div>
+
+        <div class="form-box">
+            <h2 id="form-title">➕ 新增菜品</h2>
         <input type="text" id="name" placeholder="菜名">
         <textarea id="desc" placeholder="菜品描述"></textarea>
         
@@ -27,6 +40,7 @@
         <input type="file" id="file-selector" accept="image/*">
         <button class="save-btn" onclick="uploadAndSave()">保存菜品</button>
         <button style="width:100%; margin-top:10px; border:none; background:none; cursor:pointer;" onclick="location.reload()">重置页面</button>
+    </div>
     </div>
 
     <div class="list-box">
@@ -42,6 +56,12 @@
         try {
             const response = await fetch('menu.json');
             const data = await response.json();
+
+            // 填充设置字段
+            document.getElementById('menu-title').value = data.title || '';
+            document.getElementById('menu-subtitle').value = data.subtitle || '';
+            document.getElementById('order-message').value = data.orderMessage || '';
+
             const list = document.getElementById('admin-menu-list');
             if (data.dishes && list) {
                 list.innerHTML = data.dishes.map((dish, index) => `
@@ -122,6 +142,24 @@
     }
 
     window.onload = loadMenu;
+
+    // 保存页面设置
+    async function saveSettings() {
+        const title = document.getElementById('menu-title').value;
+        const subtitle = document.getElementById('menu-subtitle').value;
+        const orderMessage = document.getElementById('order-message').value;
+        try {
+            const response = await fetch('/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, subtitle, orderMessage })
+            });
+            if (response.ok) {
+                alert('设置已保存');
+            }
+        } catch (e) { alert('保存失败'); }
+    }
 </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>

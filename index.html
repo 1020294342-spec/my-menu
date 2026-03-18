@@ -7,7 +7,8 @@
     <style>
         :root { --primary: #ff4757; --bg: #f8f9fa; }
         body { font-family: 'PingFang SC', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        h1 { color: #2f3542; margin-bottom: 20px; font-size: 24px; }
+        h1 { color: #2f3542; margin-bottom: 4px; font-size: 24px; }
+        .subtitle { color: #747d8c; font-size: 14px; margin-bottom: 20px; text-align: center; }
         .menu-grid { width: 100%; max-width: 600px; display: grid; gap: 15px; }
         .dish-card { 
             background: white; border-radius: 16px; overflow: hidden; 
@@ -29,16 +30,34 @@
 </head>
 <body>
 
-    <h1>👨‍🍳 今日私房菜单</h1>
+    <h1 id="menu-title">👨‍🍳 今日私房菜单</h1>
+    <p class="subtitle" id="menu-subtitle"></p>
     <div class="menu-grid" id="menu-list">
         </div>
 
     <script>
+        let orderMessage = '下单成功！已通知厨房准备：{name}';
+
         // 从 menu.json 读取数据
         async function fetchMenu() {
             try {
                 const response = await fetch('menu.json');
                 const data = await response.json();
+
+                // 读取标题和备注
+                if (data.title) {
+                    document.getElementById('menu-title').textContent = '👨‍🍳 ' + data.title;
+                }
+                const subtitleEl = document.getElementById('menu-subtitle');
+                if (data.subtitle) {
+                    subtitleEl.textContent = data.subtitle;
+                } else {
+                    subtitleEl.style.display = 'none';
+                }
+                if (data.orderMessage) {
+                    orderMessage = data.orderMessage;
+                }
+
                 renderMenu(data.dishes);
             } catch (e) {
                 console.error("加载菜单失败，请检查文件是否存在", e);
@@ -93,7 +112,7 @@
                 const result = await resp.json();
 
                 if (result.code === 0) {
-                    alert(`✅ 下单成功！已通知厨房准备：${name}`);
+                    alert('✅ ' + orderMessage.replace('{name}', name));
                 } else {
                     alert(`⚠️ 下单成功，但通知发送失败，请直接联系店主`);
                     console.error('Server酱返回错误:', result);

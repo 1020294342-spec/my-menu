@@ -13,23 +13,33 @@ def run_command(command):
 
 def sync_to_github():
     print("🚀 开始同步菜单到 GitHub...")
-    
+
     # 1. 确保在正确的文件夹路径（当前脚本所在目录）
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-    # 2. 检查 Git 状态
-    print("📦 正在整理文件...")
-    run_command("git add index.html menu.json images/*")
+    # 2. 先拉取远程最新内容，避免冲突
+    print("🔄 正在拉取远程最新内容...")
+    if not run_command("git pull origin main --allow-unrelated-histories"):
+        print("❌ 拉取失败，请检查网络或手动解决冲突。")
+        return
 
-    # 3. 提交修改，备注加上当前时间
+    # 3. 添加文件到暂存区
+    print("📦 正在整理文件...")
+    run_command("git add index.html admin.html menu.json server.py push_menu.py images/*")
+
+    # 4. 提交修改，备注加上当前时间
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     commit_message = f"Update menu at {now}"
-    if run_command(f'git commit -m "{commit_message}"'):
+    has_changes = run_command(f'git commit -m "{commit_message}"')
+
+    if has_changes:
         print(f"✅ 已生成提交记录: {commit_message}")
     else:
         print("ℹ️ 没有发现新改动，无需提交。")
+        print("✅ 本地已是最新状态，无需上传。")
+        return
 
-    # 4. 推送到 GitHub
+    # 5. 推送到 GitHub
     print("☁️ 正在上传到远程仓库...")
     if run_command("git push origin main"):
         print("\n🎉 同步成功！菜单已飞向云端。")

@@ -82,7 +82,7 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 
             with open('menu.json', 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            
+
             if 0 <= index < len(data['dishes']):
                 data['dishes'].pop(index)
                 with open('menu.json', 'w', encoding='utf-8') as f:
@@ -90,6 +90,27 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_response(200)
             else:
                 self.send_response(404)
+            self.end_headers()
+            return
+
+        # 5. 处理页面设置 (/settings)
+        if self.path == '/settings':
+            content_length = int(self.headers['Content-Length'])
+            settings = json.loads(self.rfile.read(content_length).decode('utf-8'))
+
+            data = {"dishes": []}
+            if os.path.exists('menu.json'):
+                with open('menu.json', 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+            data['title'] = settings.get('title', '')
+            data['subtitle'] = settings.get('subtitle', '')
+            data['orderMessage'] = settings.get('orderMessage', '')
+
+            with open('menu.json', 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+
+            self.send_response(200)
             self.end_headers()
             return
 
