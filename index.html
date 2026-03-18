@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的私人餐厅 · 点餐</title>
+    <style>
+        :root { --primary: #ff4757; --bg: #f8f9fa; }
+        body { font-family: 'PingFang SC', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h1 { color: #2f3542; margin-bottom: 20px; font-size: 24px; }
+        .menu-grid { width: 100%; max-width: 600px; display: grid; gap: 15px; }
+        .dish-card { 
+            background: white; border-radius: 16px; overflow: hidden; 
+            display: flex; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .dish-card:active { transform: scale(0.98); }
+        .dish-img { width: 100px; height: 100px; object-fit: cover; background: #eee; }
+        .dish-info { flex: 1; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
+        .dish-name { font-size: 18px; font-weight: bold; color: #2f3542; }
+        .dish-desc { font-size: 13px; color: #747d8c; margin: 4px 0; }
+        .dish-footer { display: flex; justify-content: space-between; align-items: center; }
+        .price { color: var(--primary); font-weight: bold; font-size: 16px; }
+        .order-btn { 
+            background: var(--primary); color: white; border: none; 
+            padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>👨‍🍳 今日私房菜单</h1>
+    <div class="menu-grid" id="menu-list">
+        </div>
+
+    <script>
+        // 从 menu.json 读取数据
+        async function fetchMenu() {
+            try {
+                const response = await fetch('menu.json');
+                const data = await response.json();
+                renderMenu(data.dishes);
+            } catch (e) {
+                console.error("加载菜单失败，请检查文件是否存在", e);
+            }
+        }
+
+        function renderMenu(dishes) {
+            const list = document.getElementById('menu-list');
+            list.innerHTML = ''; 
+
+            dishes.forEach(dish => {
+                const card = document.createElement('div');
+                card.className = 'dish-card';
+                
+                // 处理图片显示逻辑：如果没有图或加载失败，显示默认图标
+                const imgUrl = dish.image || "https://img.icons8.com/fluency/96/meal.png";
+                
+                card.innerHTML = `
+                    <img src="${imgUrl}" class="dish-img" onerror="this.src='https://img.icons8.com/fluency/96/meal.png'">
+                    <div class="dish-info">
+                        <div>
+                            <div class="dish-name">${dish.name}</div>
+                            <div class="dish-desc">${dish.description}</div>
+                        </div>
+                        <div class="dish-footer">
+                            <div class="price">免费点餐</div>
+                            <button class="order-btn" onclick="orderDish('${dish.name}')">下单</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        // ⚠️ 把下面的 YOUR_SENDKEY 替换成你自己的 Server酱 SendKey
+        const SENDKEY = 'SCT322217TlEvM6MSkyfSoOVTtwW8Cqau0';
+
+        async function orderDish(name) {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '下单中...';
+
+            try {
+                const title = `新订单：${name}`;
+                const desp = `有人点了 **${name}**\n\n下单时间：${new Date().toLocaleString('zh-CN')}`;
+
+                const resp = await fetch(`https://sctapi.ftqq.com/${SENDKEY}.send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, desp })
+                });
+                const result = await resp.json();
+
+                if (result.code === 0) {
+                    alert(`✅ 下单成功！已通知厨房准备：${name}`);
+                } else {
+                    alert(`⚠️ 下单成功，但通知发送失败，请直接联系店主`);
+                    console.error('Server酱返回错误:', result);
+                }
+            } catch (e) {
+                alert(`⚠️ 网络异常，请直接联系店主`);
+                console.error('推送失败:', e);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '下单';
+            }
+        }
+
+        // 页面打开时自动运行
+        fetchMenu();
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
