@@ -142,6 +142,12 @@
       "description": "说做的不好吃可不行",
       "image": "images/default.png",
       "price": "0"
+    },
+    {
+      "name": "炸鸡翅根",
+      "description": "每次都做的不一样",
+      "image": "images/default.png",
+      "price": "0"
     }
   ]
 }
