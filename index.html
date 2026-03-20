@@ -22,21 +22,55 @@
         .dish-desc { font-size: 13px; color: #747d8c; margin: 4px 0; }
         .dish-footer { display: flex; justify-content: space-between; align-items: center; }
         .price { color: var(--primary); font-weight: bold; font-size: 16px; }
-        .order-btn { 
-            background: var(--primary); color: white; border: none; 
+        .order-btn {
+            background: var(--primary); color: white; border: none;
             padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px;
         }
+        .search-box { width: 100%; max-width: 600px; margin-bottom: 15px; }
+        .search-box input {
+            width: 100%; padding: 12px 16px; box-sizing: border-box;
+            border: 1px solid #ddd; border-radius: 24px; font-size: 15px;
+            background: white; outline: none;
+        }
+        .search-box input:focus { border-color: var(--primary); }
+        .note-box {
+            width: 100%; max-width: 600px; margin-top: 20px;
+            background: white; border-radius: 16px; padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box;
+        }
+        .note-box h3 { margin: 0 0 10px; font-size: 16px; color: #2f3542; }
+        .note-box textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 14px; resize: vertical; min-height: 60px; box-sizing: border-box;
+            font-family: inherit;
+        }
+        .note-btn {
+            margin-top: 10px; width: 100%; padding: 10px; background: var(--primary);
+            color: white; border: none; border-radius: 20px; cursor: pointer;
+            font-size: 15px; font-weight: bold;
+        }
+        .note-btn:disabled { background: #ccc; }
+        .no-result { text-align: center; color: #999; padding: 40px 0; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <h1 id="menu-title">👨‍🍳 今日私房菜单</h1>
     <p class="subtitle" id="menu-subtitle"></p>
+    <div class="search-box">
+        <input type="text" id="search-input" placeholder="🔍 搜索菜品..." oninput="filterDishes()">
+    </div>
     <div class="menu-grid" id="menu-list">
         </div>
+    <div class="note-box">
+        <h3>📝 备注留言</h3>
+        <textarea id="order-note" placeholder="有什么想告诉店主的？比如：忌辣、多放葱、几点到..."></textarea>
+        <button class="note-btn" id="note-btn" onclick="sendNote()">发送备注</button>
+    </div>
 
     <script>
         let orderMessage = '下单成功！已通知厨房准备：{name}';
+        let allDishes = [];
 
         // 从 menu.json 读取数据
         async function fetchMenu() {
@@ -58,15 +92,34 @@
                     orderMessage = data.orderMessage;
                 }
 
-                renderMenu(data.dishes);
+                allDishes = data.dishes;
+                renderMenu(allDishes);
             } catch (e) {
                 console.error("加载菜单失败，请检查文件是否存在", e);
             }
         }
 
+        function filterDishes() {
+            const keyword = document.getElementById('search-input').value.trim().toLowerCase();
+            if (!keyword) {
+                renderMenu(allDishes);
+                return;
+            }
+            const filtered = allDishes.filter(dish =>
+                dish.name.toLowerCase().includes(keyword) ||
+                dish.description.toLowerCase().includes(keyword)
+            );
+            renderMenu(filtered);
+        }
+
         function renderMenu(dishes) {
             const list = document.getElementById('menu-list');
-            list.innerHTML = ''; 
+            list.innerHTML = '';
+
+            if (dishes.length === 0) {
+                list.innerHTML = '<div class="no-result">没有找到相关菜品</div>';
+                return;
+            }
 
             dishes.forEach(dish => {
                 const card = document.createElement('div');
@@ -123,6 +176,39 @@
             } finally {
                 btn.disabled = false;
                 btn.textContent = '下单';
+            }
+        }
+
+        async function sendNote() {
+            const note = document.getElementById('order-note').value.trim();
+            if (!note) return alert('请先输入备注内容');
+
+            const btn = document.getElementById('note-btn');
+            btn.disabled = true;
+            btn.textContent = '发送中...';
+
+            try {
+                const title = '📝 顾客备注';
+                const desp = `备注内容：**${note}**\n\n时间：${new Date().toLocaleString('zh-CN')}`;
+
+                const resp = await fetch(`https://sctapi.ftqq.com/${SENDKEY}.send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, desp })
+                });
+                const result = await resp.json();
+
+                if (result.code === 0) {
+                    alert('✅ 备注已发送给店主！');
+                    document.getElementById('order-note').value = '';
+                } else {
+                    alert('⚠️ 发送失败，请直接联系店主');
+                }
+            } catch (e) {
+                alert('⚠️ 网络异常，请直接联系店主');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '发送备注';
             }
         }
 
