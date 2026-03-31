@@ -148,6 +148,36 @@
       "description": "每次都做的不一样",
       "image": "images/default.png",
       "price": "0"
+    },
+    {
+      "name": "清炖排骨",
+      "description": "很清",
+      "image": "images/微信图片_20260331160828_805_220.jpg",
+      "price": "0"
+    },
+    {
+      "name": "杭椒牛柳",
+      "description": "杭椒不辣",
+      "image": "images/微信图片_20260331160825_802_220.jpg",
+      "price": "0"
+    },
+    {
+      "name": "辣子鸡翅",
+      "description": "巨好吃，将给出高达98的评分",
+      "image": "images/微信图片_20260331160824_801_220.jpg",
+      "price": "0"
+    },
+    {
+      "name": "舒芙蕾",
+      "description": "甜品平替，吃起来一般",
+      "image": "images/微信图片_20260331160826_803_220.jpg",
+      "price": "0"
+    },
+    {
+      "name": "浇汁土豆泥",
+      "description": "黑椒汁or肉酱",
+      "image": "images/微信图片_20260331160827_804_220.jpg",
+      "price": "0"
     }
   ]
 }
