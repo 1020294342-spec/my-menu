@@ -178,6 +178,24 @@
       "description": "黑椒汁or肉酱",
       "image": "images/微信图片_20260331160827_804_220.jpg",
       "price": "0"
+    },
+    {
+      "name": "三汁焖锅",
+      "description": "鸡翅锅实测好吃",
+      "image": "images/微信图片_20260419115042_928_220.jpg",
+      "price": "0"
+    },
+    {
+      "name": "浇汁豆腐",
+      "description": "treetree的",
+      "image": "images/微信图片_20260419115045_929_220.jpg",
+      "price": "0"
+    },
+    {
+      "name": "麻薯",
+      "description": "小甜点",
+      "image": "images/微信图片_20260419115035_926_220.jpg",
+      "price": "0"
     }
   ]
 }
