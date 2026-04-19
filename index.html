@@ -5,16 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的私人餐厅 · 点餐</title>
     <style>
+        /* === 基础样式 === */
         :root { --primary: #ff4757; --bg: #f8f9fa; }
-        body { font-family: 'PingFang SC', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: 'PingFang SC', sans-serif; background: var(--bg); margin: 0; padding: 20px 20px 100px; display: flex; flex-direction: column; align-items: center; }
         h1 { color: #2f3542; margin-bottom: 4px; font-size: 24px; }
         .subtitle { color: #747d8c; font-size: 14px; margin-bottom: 20px; text-align: center; }
+
+        /* === 搜索框 === */
+        .search-box { width: 100%; max-width: 600px; margin-bottom: 15px; }
+        .search-box input { width: 100%; padding: 12px 16px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 24px; font-size: 15px; background: white; outline: none; }
+        .search-box input:focus { border-color: var(--primary); }
+
+        /* === 菜品卡片 === */
         .menu-grid { width: 100%; max-width: 600px; display: grid; gap: 15px; }
-        .dish-card { 
-            background: white; border-radius: 16px; overflow: hidden; 
-            display: flex; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
-        }
+        .dish-card { background: white; border-radius: 16px; overflow: hidden; display: flex; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s; }
         .dish-card:active { transform: scale(0.98); }
         .dish-img { width: 100px; height: 100px; object-fit: cover; background: #eee; }
         .dish-info { flex: 1; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
@@ -22,35 +26,39 @@
         .dish-desc { font-size: 13px; color: #747d8c; margin: 4px 0; }
         .dish-footer { display: flex; justify-content: space-between; align-items: center; }
         .price { color: var(--primary); font-weight: bold; font-size: 16px; }
-        .order-btn {
-            background: var(--primary); color: white; border: none;
-            padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px;
-        }
-        .search-box { width: 100%; max-width: 600px; margin-bottom: 15px; }
-        .search-box input {
-            width: 100%; padding: 12px 16px; box-sizing: border-box;
-            border: 1px solid #ddd; border-radius: 24px; font-size: 15px;
-            background: white; outline: none;
-        }
-        .search-box input:focus { border-color: var(--primary); }
-        .note-box {
-            width: 100%; max-width: 600px; margin-top: 20px;
-            background: white; border-radius: 16px; padding: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box;
-        }
-        .note-box h3 { margin: 0 0 10px; font-size: 16px; color: #2f3542; }
-        .note-box textarea {
-            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;
-            font-size: 14px; resize: vertical; min-height: 60px; box-sizing: border-box;
-            font-family: inherit;
-        }
-        .note-btn {
-            margin-top: 10px; width: 100%; padding: 10px; background: var(--primary);
-            color: white; border: none; border-radius: 20px; cursor: pointer;
-            font-size: 15px; font-weight: bold;
-        }
-        .note-btn:disabled { background: #ccc; }
         .no-result { text-align: center; color: #999; padding: 40px 0; font-size: 14px; }
+
+        /* === 加减按钮组 === */
+        .qty-control { display: flex; align-items: center; gap: 8px; }
+        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .qty-btn.minus { background: #f1f2f6; color: #2f3542; }
+        .qty-btn.plus { background: var(--primary); color: white; }
+        .qty-num { font-size: 16px; font-weight: bold; min-width: 20px; text-align: center; color: #2f3542; }
+        .add-btn { background: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 14px; }
+
+        /* === 备注区域 === */
+        .note-box { width: 100%; max-width: 600px; margin-top: 20px; background: white; border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box; }
+        .note-box h3 { margin: 0 0 10px; font-size: 16px; color: #2f3542; }
+        .note-box textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 60px; box-sizing: border-box; font-family: inherit; }
+
+        /* === 底部购物车栏 === */
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; box-shadow: 0 -4px 16px rgba(0,0,0,0.1); display: flex; align-items: center; padding: 12px 20px; z-index: 100; }
+        .cart-icon { position: relative; font-size: 28px; margin-right: 12px; cursor: pointer; }
+        .cart-badge { position: absolute; top: -6px; right: -8px; background: var(--primary); color: white; font-size: 12px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .cart-summary { flex: 1; font-size: 14px; color: #747d8c; }
+        .cart-summary strong { color: #2f3542; font-size: 16px; }
+        .cart-submit { background: var(--primary); color: white; border: none; padding: 12px 28px; border-radius: 24px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .cart-submit:disabled { background: #ccc; }
+
+        /* === 购物车弹出层 === */
+        .cart-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 200; }
+        .cart-overlay.show { display: block; }
+        .cart-panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 20px 20px 0 0; max-height: 60vh; overflow-y: auto; z-index: 201; padding: 20px; }
+        .cart-panel h3 { margin: 0 0 15px; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+        .cart-clear { font-size: 14px; color: #999; cursor: pointer; font-weight: normal; }
+        .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f2f6; }
+        .cart-item-name { font-size: 15px; color: #2f3542; flex: 1; }
+        .cart-empty { text-align: center; color: #999; padding: 30px 0; }
     </style>
 </head>
 <body>
@@ -60,161 +68,217 @@
     <div class="search-box">
         <input type="text" id="search-input" placeholder="🔍 搜索菜品..." oninput="filterDishes()">
     </div>
-    <div class="menu-grid" id="menu-list">
-        </div>
+    <div class="menu-grid" id="menu-list"></div>
     <div class="note-box">
         <h3>📝 备注留言</h3>
         <textarea id="order-note" placeholder="有什么想告诉店主的？比如：忌辣、多放葱、几点到..."></textarea>
-        <button class="note-btn" id="note-btn" onclick="sendNote()">发送备注</button>
     </div>
 
-    <script>
-        let orderMessage = '下单成功！已通知厨房准备：{name}';
-        let allDishes = [];
+    <!-- 底部购物车栏 -->
+    <div class="cart-bar">
+        <div class="cart-icon" onclick="toggleCart()">
+            🛒<span class="cart-badge" id="cart-badge" style="display:none">0</span>
+        </div>
+        <div class="cart-summary">
+            <span id="cart-info">购物车是空的</span>
+        </div>
+        <button class="cart-submit" id="cart-submit" disabled onclick="submitOrder()">去下单</button>
+    </div>
 
-        // 从 menu.json 读取数据
-        async function fetchMenu() {
-            try {
-                const response = await fetch('menu.json');
-                const data = await response.json();
+    <!-- 购物车弹出层 -->
+    <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+    <div class="cart-panel" id="cart-panel" style="display:none">
+        <h3>🛒 已选菜品 <span class="cart-clear" onclick="clearCart()">清空</span></h3>
+        <div id="cart-list"></div>
+    </div>
 
-                // 读取标题和备注
-                if (data.title) {
-                    document.getElementById('menu-title').textContent = '👨‍🍳 ' + data.title;
-                }
-                const subtitleEl = document.getElementById('menu-subtitle');
-                if (data.subtitle) {
-                    subtitleEl.textContent = data.subtitle;
-                } else {
-                    subtitleEl.style.display = 'none';
-                }
-                if (data.orderMessage) {
-                    orderMessage = data.orderMessage;
-                }
+<script>
+    // ⚠️ 把下面的 YOUR_SENDKEY 替换成你自己的 Server酱 SendKey
+    const SENDKEY = 'SCT322217TlEvM6MSkyfSoOVTtwW8Cqau0';
 
-                allDishes = data.dishes;
-                renderMenu(allDishes);
-            } catch (e) {
-                console.error("加载菜单失败，请检查文件是否存在", e);
-            }
-        }
+    let orderMessage = '下单成功！已通知厨房准备：{name}';
+    let allDishes = [];
+    let cart = {}; // { 菜名: 数量 }
 
-        function filterDishes() {
-            const keyword = document.getElementById('search-input').value.trim().toLowerCase();
-            if (!keyword) {
-                renderMenu(allDishes);
-                return;
-            }
-            const filtered = allDishes.filter(dish =>
-                dish.name.toLowerCase().includes(keyword) ||
-                dish.description.toLowerCase().includes(keyword)
-            );
-            renderMenu(filtered);
-        }
+    // === 加载菜单 ===
+    async function fetchMenu() {
+        try {
+            const response = await fetch('menu.json');
+            const data = await response.json();
+            if (data.title) document.getElementById('menu-title').textContent = '👨‍🍳 ' + data.title;
+            const subtitleEl = document.getElementById('menu-subtitle');
+            if (data.subtitle) { subtitleEl.textContent = data.subtitle; } else { subtitleEl.style.display = 'none'; }
+            if (data.orderMessage) orderMessage = data.orderMessage;
+            allDishes = data.dishes;
+            renderMenu(allDishes);
+        } catch (e) { console.error("加载菜单失败", e); }
+    }
 
-        function renderMenu(dishes) {
-            const list = document.getElementById('menu-list');
-            list.innerHTML = '';
+    // === 搜索筛选 ===
+    function filterDishes() {
+        const keyword = document.getElementById('search-input').value.trim().toLowerCase();
+        if (!keyword) { renderMenu(allDishes); return; }
+        renderMenu(allDishes.filter(d => d.name.toLowerCase().includes(keyword) || d.description.toLowerCase().includes(keyword)));
+    }
 
-            if (dishes.length === 0) {
-                list.innerHTML = '<div class="no-result">没有找到相关菜品</div>';
-                return;
-            }
+    // === 渲染菜单 ===
+    function renderMenu(dishes) {
+        const list = document.getElementById('menu-list');
+        list.innerHTML = '';
+        if (dishes.length === 0) { list.innerHTML = '<div class="no-result">没有找到相关菜品</div>'; return; }
 
-            dishes.forEach(dish => {
-                const card = document.createElement('div');
-                card.className = 'dish-card';
-                
-                // 处理图片显示逻辑：如果没有图或加载失败，显示默认图标
-                const imgUrl = dish.image || "https://img.icons8.com/fluency/96/meal.png";
-                
-                card.innerHTML = `
-                    <img src="${imgUrl}" class="dish-img" onerror="this.src='https://img.icons8.com/fluency/96/meal.png'">
-                    <div class="dish-info">
-                        <div>
-                            <div class="dish-name">${dish.name}</div>
-                            <div class="dish-desc">${dish.description}</div>
-                        </div>
-                        <div class="dish-footer">
-                            <div class="price">免费点餐</div>
-                            <button class="order-btn" onclick="orderDish('${dish.name}')">下单</button>
-                        </div>
+        dishes.forEach(dish => {
+            const card = document.createElement('div');
+            card.className = 'dish-card';
+            const imgUrl = dish.image || "https://img.icons8.com/fluency/96/meal.png";
+            const qty = cart[dish.name] || 0;
+            const escapedName = dish.name.replace(/'/g, "\\'");
+
+            card.innerHTML = `
+                <img src="${imgUrl}" class="dish-img" onerror="this.src='https://img.icons8.com/fluency/96/meal.png'">
+                <div class="dish-info">
+                    <div>
+                        <div class="dish-name">${dish.name}</div>
+                        <div class="dish-desc">${dish.description}</div>
                     </div>
-                `;
-                list.appendChild(card);
+                    <div class="dish-footer">
+                        <div class="price">免费点餐</div>
+                        ${qty > 0 ? `
+                        <div class="qty-control">
+                            <button class="qty-btn minus" onclick="changeQty('${escapedName}', -1)">−</button>
+                            <span class="qty-num">${qty}</span>
+                            <button class="qty-btn plus" onclick="changeQty('${escapedName}', 1)">+</button>
+                        </div>` : `
+                        <button class="add-btn" onclick="changeQty('${escapedName}', 1)">+ 加入</button>`}
+                    </div>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    // === 购物车操作 ===
+    function changeQty(name, delta) {
+        cart[name] = (cart[name] || 0) + delta;
+        if (cart[name] <= 0) delete cart[name];
+        updateCartUI();
+        renderMenu(getCurrentDisplayDishes());
+    }
+
+    function getCurrentDisplayDishes() {
+        const keyword = document.getElementById('search-input').value.trim().toLowerCase();
+        if (!keyword) return allDishes;
+        return allDishes.filter(d => d.name.toLowerCase().includes(keyword) || d.description.toLowerCase().includes(keyword));
+    }
+
+    function clearCart() {
+        cart = {};
+        updateCartUI();
+        renderMenu(getCurrentDisplayDishes());
+        toggleCart();
+    }
+
+    function updateCartUI() {
+        const names = Object.keys(cart);
+        const totalCount = names.reduce((sum, n) => sum + cart[n], 0);
+        const badge = document.getElementById('cart-badge');
+        const info = document.getElementById('cart-info');
+        const btn = document.getElementById('cart-submit');
+
+        if (totalCount > 0) {
+            badge.style.display = 'flex';
+            badge.textContent = totalCount;
+            info.innerHTML = '<strong>' + totalCount + ' 道菜</strong> 已选好';
+            btn.disabled = false;
+        } else {
+            badge.style.display = 'none';
+            info.textContent = '购物车是空的';
+            btn.disabled = true;
+        }
+        renderCartPanel();
+    }
+
+    function renderCartPanel() {
+        const list = document.getElementById('cart-list');
+        const names = Object.keys(cart);
+        if (names.length === 0) { list.innerHTML = '<div class="cart-empty">还没选菜哦~</div>'; return; }
+        list.innerHTML = names.map(name => {
+            const escapedName = name.replace(/'/g, "\\'");
+            return `<div class="cart-item">
+                <span class="cart-item-name">${name}</span>
+                <div class="qty-control">
+                    <button class="qty-btn minus" onclick="changeQty('${escapedName}', -1)">−</button>
+                    <span class="qty-num">${cart[name]}</span>
+                    <button class="qty-btn plus" onclick="changeQty('${escapedName}', 1)">+</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // === 购物车弹出/收起 ===
+    function toggleCart() {
+        const overlay = document.getElementById('cart-overlay');
+        const panel = document.getElementById('cart-panel');
+        const isOpen = overlay.classList.contains('show');
+        if (isOpen) {
+            overlay.classList.remove('show');
+            panel.style.display = 'none';
+        } else {
+            renderCartPanel();
+            overlay.classList.add('show');
+            panel.style.display = 'block';
+        }
+    }
+
+    // === 统一下单 ===
+    async function submitOrder() {
+        const names = Object.keys(cart);
+        if (names.length === 0) return;
+
+        const btn = document.getElementById('cart-submit');
+        btn.disabled = true;
+        btn.textContent = '下单中...';
+
+        const orderList = names.map(n => `${n} x${cart[n]}`).join('\n');
+        const note = document.getElementById('order-note').value.trim();
+
+        try {
+            const title = '🛒 新订单（' + names.length + '道菜）';
+            let desp = '**点菜清单：**\n\n' + names.map(n => `- ${n} x${cart[n]}`).join('\n');
+            if (note) desp += '\n\n**备注：** ' + note;
+            desp += '\n\n下单时间：' + new Date().toLocaleString('zh-CN');
+
+            const resp = await fetch(`https://sctapi.ftqq.com/${SENDKEY}.send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, desp })
             });
-        }
+            const result = await resp.json();
 
-        // ⚠️ 把下面的 YOUR_SENDKEY 替换成你自己的 Server酱 SendKey
-        const SENDKEY = 'SCT322217TlEvM6MSkyfSoOVTtwW8Cqau0';
-
-        async function orderDish(name) {
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '下单中...';
-
-            try {
-                const title = `新订单：${name}`;
-                const desp = `有人点了 **${name}**\n\n下单时间：${new Date().toLocaleString('zh-CN')}`;
-
-                const resp = await fetch(`https://sctapi.ftqq.com/${SENDKEY}.send`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, desp })
-                });
-                const result = await resp.json();
-
-                if (result.code === 0) {
-                    alert('✅ ' + orderMessage.replace('{name}', name));
-                } else {
-                    alert(`⚠️ 下单成功，但通知发送失败，请直接联系店主`);
-                    console.error('Server酱返回错误:', result);
-                }
-            } catch (e) {
-                alert(`⚠️ 网络异常，请直接联系店主`);
-                console.error('推送失败:', e);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '下单';
+            if (result.code === 0) {
+                const allNames = names.join('、');
+                alert('✅ ' + orderMessage.replace('{name}', allNames));
+                cart = {};
+                document.getElementById('order-note').value = '';
+                updateCartUI();
+                renderMenu(getCurrentDisplayDishes());
+                // 关闭购物车弹窗
+                document.getElementById('cart-overlay').classList.remove('show');
+                document.getElementById('cart-panel').style.display = 'none';
+            } else {
+                alert('⚠️ 下单成功，但通知发送失败，请直接联系店主');
             }
+        } catch (e) {
+            alert('⚠️ 网络异常，请直接联系店主');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '去下单';
+            updateCartUI();
         }
+    }
 
-        async function sendNote() {
-            const note = document.getElementById('order-note').value.trim();
-            if (!note) return alert('请先输入备注内容');
-
-            const btn = document.getElementById('note-btn');
-            btn.disabled = true;
-            btn.textContent = '发送中...';
-
-            try {
-                const title = '📝 顾客备注';
-                const desp = `备注内容：**${note}**\n\n时间：${new Date().toLocaleString('zh-CN')}`;
-
-                const resp = await fetch(`https://sctapi.ftqq.com/${SENDKEY}.send`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, desp })
-                });
-                const result = await resp.json();
-
-                if (result.code === 0) {
-                    alert('✅ 备注已发送给店主！');
-                    document.getElementById('order-note').value = '';
-                } else {
-                    alert('⚠️ 发送失败，请直接联系店主');
-                }
-            } catch (e) {
-                alert('⚠️ 网络异常，请直接联系店主');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '发送备注';
-            }
-        }
-
-        // 页面打开时自动运行
-        fetchMenu();
-    </script>
+    fetchMenu();
+</script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
